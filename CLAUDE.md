@@ -35,11 +35,18 @@ AI client <--MCP/stdio--> bridge.exe <--TCP 6060--> lv_bridge.vi <--scripting-->
 | `discovery.go` | Wi-Fi adapter IP sniff, ASCII/SVG QR code, browser launch |
 | `bridge_test.go` | Payload translation, field parsing, RPC dispatch |
 | `BRIDGE_VI.md` | How to build the LabVIEW-side addon |
+| `FAST_PATH.md` | Prebuilt third-party alternative that skips the hand-built VI |
+| `install.ps1` | One-command setup of the prebuilt path on Windows |
 | `README.md` | Install and usage |
 
 ## Status
 Go side complete. `lv_bridge.vi` is **not** built; see `BRIDGE_VI.md`. Until it
 exists, use `-mock` to exercise the chain.
+
+For working VI generation today, `FAST_PATH.md` and `install.ps1` set up
+JanGoebel/G-AI instead. That is third-party software, downloaded from its own
+release at install time and never vendored here, because it ships no licence
+file. Do not commit its binaries into this repo.
 
 ## Commands
 ```

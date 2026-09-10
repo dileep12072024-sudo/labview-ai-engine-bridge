@@ -1,8 +1,9 @@
 # LabVIEW-AI-Engine-Bridge
 
-> **Want it working today without building a VI by hand?** Read `FAST_PATH.md`.
-> Jan Goebel's G-AI installs the LabVIEW side as a single package. This repo's
-> own path needs `lv_bridge.vi` built once, and adds a phone dashboard in return.
+> **Want it working today without building a VI by hand?** Run `.\install.ps1`
+> and read `FAST_PATH.md`. It installs Jan Goebel's G-AI, a prebuilt LabVIEW MCP
+> server, and wires it into Claude Desktop. This repo's own path needs
+> `lv_bridge.vi` built once, and adds a phone dashboard in return.
 
 An offline, local-hardware MCP server that lets an AI application build LabVIEW
 VIs from scratch. Same shape as Blender MCP: a server the AI talks to, plus an

@@ -16,6 +16,31 @@ this repo adds.
 
 ---
 
+## One command
+
+From the repo folder in **PowerShell**:
+
+```powershell
+cd C:\LabVIEW-AI-Engine-Bridge
+.\install.ps1
+```
+
+It checks Node.js, downloads the G-AI package from its official release, opens
+it in VI Package Manager, and merges the Claude Desktop config entry without
+touching any other MCP server you already have. Your existing config is backed
+up to `claude_desktop_config.json.bak` first.
+
+If PowerShell blocks the script, allow it for this session only:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+The manual steps below are what the script does, in case you would rather do
+them yourself or something goes wrong.
+
+---
+
 ## Step 1. Install Node.js
 
 The MCP server runs inside LabVIEW over HTTP, and Claude Desktop reaches it
