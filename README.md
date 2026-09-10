@@ -12,16 +12,13 @@ Claude  <--MCP/stdio-->  bridge.exe  <--TCP 6060-->  lv_bridge.vi  <--scripting-
 
 ## Install
 
-**1. Nothing to install.** `bridge.exe` is already built for Windows and sits in
-this folder at `C:\Users\Dileep\LabVIEW-AI-Engine-Bridge\bridge.exe`. It is a
-single static binary with no runtime dependency.
+**Setting this up on another PC? Follow `INSTALL.md`. It has every command.**
 
-To rebuild it after editing, install Go from https://go.dev/dl (1.22 or newer):
+The prebuilt Windows binary is committed at `dist\bridge.exe`, so no Go
+toolchain is needed to run it. To rebuild after editing the Go code:
 
 ```
-go mod tidy
-go test ./...
-go build -o bridge.exe .
+go mod tidy && go test ./... && go build -o dist/bridge.exe .
 ```
 
 **2. Register it with your AI application.**
@@ -29,7 +26,7 @@ go build -o bridge.exe .
 Claude Code, one command:
 
 ```
-claude mcp add labview -- C:\Users\Dileep\LabVIEW-AI-Engine-Bridge\bridge.exe -stdio
+claude mcp add labview -- C:\LabVIEW-AI-Engine-Bridge\dist\bridge.exe -stdio
 ```
 
 Claude Desktop, edit `%APPDATA%\Claude\claude_desktop_config.json`:
@@ -38,7 +35,7 @@ Claude Desktop, edit `%APPDATA%\Claude\claude_desktop_config.json`:
 {
   "mcpServers": {
     "labview": {
-      "command": "C:\\Users\\Dileep\\LabVIEW-AI-Engine-Bridge\\bridge.exe",
+      "command": "C:\\LabVIEW-AI-Engine-Bridge\\dist\\bridge.exe",
       "args": ["-stdio"]
     }
   }
@@ -106,6 +103,7 @@ localStorage, no cookies, no history. Close the tab and the session is gone.
 -port 8080             dashboard port
 -labview 127.0.0.1:6060  bridge VI address
 -qr-svg lan.svg        also write the QR code as SVG
+-send "CMD:PING"       send one raw command to the bridge VI and exit
 -no-browser            do not auto-launch the browser
 ```
 
