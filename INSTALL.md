@@ -1,5 +1,9 @@
 # Install on a new PC
 
+> **Want it working today without building a VI by hand?** Read `FAST_PATH.md`.
+> Jan Goebel's G-AI installs the LabVIEW side as a single package. This repo's
+> own path needs `lv_bridge.vi` built once, and adds a phone dashboard in return.
+
 Windows, with Claude Desktop. Every command below is copy-paste ready. Run them
 in **PowerShell**, not Command Prompt.
 
