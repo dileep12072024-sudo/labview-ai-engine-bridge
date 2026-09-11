@@ -47,6 +47,27 @@ Leave G-AI running in LabVIEW. In Claude Desktop, ask:
 
 Start small and confirm it works before asking for a PID controller.
 
+## Reading VIs you already have
+
+The AI cannot parse a `.vi` file, because the format is binary. It does not need
+to. Once LabVIEW is the one doing the looking, two routes open up, and both are
+already in the installed tools:
+
+- **Screenshots.** The server can hand back a picture of a block diagram or a
+  front panel. The AI looks at it the same way it looks at a Blender viewport.
+- **Structural text.** VI Scripting can walk a VI's objects and report the nodes,
+  their labels and their wiring as text. That is more precise than a picture for
+  tracing logic, because nothing depends on reading pixels.
+
+So you can point at an existing VI and ask about it:
+
+> Open C:\vis\legacy.vi, show me the block diagram, and explain what it does.
+
+> Look at this VI and tell me why the shift register is not updating.
+
+Use the picture for layout and the structural text for logic. Ask for both when
+a VI is dense.
+
 ## Options
 
 ```powershell
