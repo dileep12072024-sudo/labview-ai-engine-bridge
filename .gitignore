@@ -1,4 +1,49 @@
-# build scratch
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+*.out
 *.log
-lan.svg
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+.DS_Store
+Thumbs.db
+
+# Go build cache
+/dist/
+go.sum
+vendor/
+
+# Test artifacts
+*.cover
+*.coverprofile
+coverage.out
+
+# OS specific
+.env
+.env.local
+*.tmp
+
+# Dashboard/temp files
 tmp/
+lan.svg
+*.qr
+
+# LabVIEW specific
+*.vi
+*.ctl
+*.lvproj
+
+# Debug
+debug.log
+pprof.out
