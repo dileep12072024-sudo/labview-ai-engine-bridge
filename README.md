@@ -1,11 +1,19 @@
 # LabVIEW-AI-Engine-Bridge
 
 > **Install in one command.** See `INSTALL.md`. Clone the repo, run
-> `.\install.ps1`, and it sets up everything including the app restarts.
+> `.\\install.ps1`, and it sets up everything including the app restarts.
 
 An offline, local-hardware MCP server that lets an AI application build LabVIEW
 VIs from scratch. Same shape as Blender MCP: a server the AI talks to, plus an
 addon running inside the host application.
+
+This repository provides a bridge between conversational AI systems (for example,
+Claude or other G-AI clients) and LabVIEW by hosting an MCP-compatible server
+that speaks the same MCP transport those clients expect. The bridge exposes a
+set of deterministic VI-scripting tools so an AI can create, wire, and run VIs
+without manual LabVIEW scripting. For a beginner-friendly, professional
+explanation of the MCP's role, how it differs from other MCPs, and what happens
+if the MCP is absent, see `MCP_ROLE.md`.
 
 ```
 Claude  <--MCP/stdio-->  bridge.exe  <--TCP 6060-->  lv_bridge.vi  <--scripting-->  LabVIEW
@@ -29,10 +37,10 @@ go mod tidy && go test ./... && go build -o dist/bridge.exe .
 Claude Code, one command:
 
 ```
-claude mcp add labview -- C:\LabVIEW-AI-Engine-Bridge\dist\bridge.exe -stdio
+claude mcp add labview -- C:\\LabVIEW-AI-Engine-Bridge\\dist\\bridge.exe -stdio
 ```
 
-Claude Desktop, edit `%APPDATA%\Claude\claude_desktop_config.json`:
+Claude Desktop, edit `%APPDATA%\\Claude\\claude_desktop_config.json`:
 
 ```json
 {
@@ -68,7 +76,7 @@ Open LabVIEW, open `lv_bridge.vi`, press Run, and leave it running. Then talk to
 your AI normally:
 
 > Build me a VI with two knobs feeding an Add function, wire the sum to a
-> numeric indicator, save it to C:\vis\adder.vi and run it.
+> numeric indicator, save it to C:\\vis\\adder.vi and run it.
 
 The AI calls `create_vi`, then `create_vi_control` twice, `add_block_node`,
 `wire_nodes`, `save_vi`, `run_vi`. Watch the front panel assemble itself.
@@ -117,3 +125,4 @@ localStorage, no cookies, no history. Close the tab and the session is gone.
   executable.
 - The bridge does not read existing VIs. It builds new ones.
 - Everything is loopback and LAN only. Nothing leaves the machine.
+
