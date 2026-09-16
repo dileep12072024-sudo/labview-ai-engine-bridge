@@ -78,7 +78,12 @@ Write-Host " - Node.js: Version 18.x or newer (for npx)"
 Write-Host " - VIPM Dependencies: 'IG HTTP Server Toolkit' & 'JKI JSONtext'"
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Next steps for G-AI:"
-Write-Host "1. Open LabVIEW and install the VIP package from C:\G-AI\builds\G-AI"
-Write-Host "2. Go to Tools -> G-AI to launch the server."
+Write-Host "Automating LabVIEW Installation..." -ForegroundColor Green
+Write-Host "Opening VIPM to install G-AI and all dependencies..."
+Start-Process "$GAIDir\src\G-AI.vipc"
+
+Write-Host ""
+Write-Host "Next steps:"
+Write-Host "1. In the VIPM window that just opened, click 'Apply Changes' to install everything."
+Write-Host "2. Open LabVIEW and go to Tools -> G-AI to launch the server."
 Write-Host "3. Open Claude/Codex/AGY and start chatting!"
