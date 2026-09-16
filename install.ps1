@@ -1,77 +1,84 @@
 param(
-    [string]$ToolkitDir = "C:\LabVIEW-MCP-Server-Toolkit"
+    [string]$GAIDownloadUrl = "https://github.com/JanGoebel/G-AI/archive/refs/heads/main.zip",
+    [string]$GAIDir = "C:\G-AI"
 )
 
-Write-Host "Checking prerequisites..." -ForegroundColor Cyan
+Write-Host "==============================================" -ForegroundColor Cyan
+Write-Host " G-AI & Screen Eyes MCP Auto-Installer" -ForegroundColor Cyan
+Write-Host "==============================================" -ForegroundColor Cyan
 
 # 1. Check Node/NPM
 if (-not (Get-Command "npx" -ErrorAction SilentlyContinue)) {
     Write-Host "Node.js (npx) is not installed. Installing automatically via winget..." -ForegroundColor Yellow
     winget install --id OpenJS.NodeJS.LTS -e --silent --accept-package-agreements --accept-source-agreements
     
-    # Reload environment variables for current process
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-    if (-not (Get-Command "npx" -ErrorAction SilentlyContinue)) {
-        Write-Host "Node.js installed, but you may need to close and reopen PowerShell for it to be recognized." -ForegroundColor Red
-        exit 1
-    }
 }
 
-# 2. Download or Update Toolkit (No Git required)
-if (Test-Path $ToolkitDir) {
-    Write-Host "LabVIEW-MCP-Server-Toolkit already exists at $ToolkitDir." -ForegroundColor Cyan
-} else {
-    Write-Host "Downloading LabVIEW-MCP-Server-Toolkit to $ToolkitDir..." -ForegroundColor Cyan
-    $ZipPath = "$env:TEMP\toolkit.zip"
-    Invoke-WebRequest -Uri "https://github.com/JanGoebel/LabVIEW-MCP-Server-Toolkit/archive/refs/heads/main.zip" -OutFile $ZipPath
-    
-    Write-Host "Extracting toolkit..." -ForegroundColor Cyan
+# 2. Download G-AI
+if (-not (Test-Path $GAIDir)) {
+    Write-Host "Downloading G-AI to $GAIDir..." -ForegroundColor Cyan
+    $ZipPath = "$env:TEMP\g-ai.zip"
+    Invoke-WebRequest -Uri $GAIDownloadUrl -OutFile $ZipPath
     Expand-Archive -Path $ZipPath -DestinationPath $env:TEMP -Force
-    Move-Item -Path "$env:TEMP\LabVIEW-MCP-Server-Toolkit-main" -Destination $ToolkitDir -Force
+    Move-Item -Path "$env:TEMP\G-AI-main" -Destination $GAIDir -Force
     Remove-Item $ZipPath -Force
 }
 
-# 3. Check for VIPM Dependencies
-Write-Host ""
-Write-Host "IMPORTANT: Please ensure you have the following VIPM dependencies installed in LabVIEW:" -ForegroundColor Yellow
-Write-Host " - IG HTTP Server Toolkit" -ForegroundColor Yellow
-Write-Host " - JKI JSONtext" -ForegroundColor Yellow
-Write-Host ""
-
-# 4. Configure Claude Desktop
+# 3. Configure Claude Desktop
 $ClaudeConfigDir = "$env:APPDATA\Claude"
 $ClaudeConfigPath = "$ClaudeConfigDir\claude_desktop_config.json"
-
-if (-not (Test-Path $ClaudeConfigDir)) {
-    New-Item -ItemType Directory -Force -Path $ClaudeConfigDir | Out-Null
-}
+if (-not (Test-Path $ClaudeConfigDir)) { New-Item -ItemType Directory -Force -Path $ClaudeConfigDir | Out-Null }
 
 $config = @{}
 if (Test-Path $ClaudeConfigPath) {
-    $configJson = Get-Content $ClaudeConfigPath -Raw
-    try {
-        $config = $configJson | ConvertFrom-Json -AsHashtable
-    } catch {
-        Write-Host "Could not parse existing claude_desktop_config.json. Proceeding with new config." -ForegroundColor Yellow
-    }
+    try { $config = (Get-Content $ClaudeConfigPath -Raw) | ConvertFrom-Json -AsHashtable } catch { }
 }
+if (-not $config.ContainsKey("mcpServers")) { $config["mcpServers"] = @{} }
 
-if (-not $config.ContainsKey("mcpServers")) {
-    $config["mcpServers"] = @{}
-}
-
-$config["mcpServers"]["LabVIEW-Assistant"] = @{
+# Add G-AI MCP
+$config["mcpServers"]["G-AI-LabVIEW"] = @{
     "command" = "npx.cmd"
     "args" = @("-y", "mcp-remote", "http://127.0.0.1:36987/mcp/server")
 }
 
-$config | ConvertTo-Json -Depth 10 | Set-Content $ClaudeConfigPath
-Write-Host "Added 'LabVIEW-Assistant' MCP server to Claude Desktop config at $ClaudeConfigPath." -ForegroundColor Green
+# Add Screen Sharing / Eyes MCP
+$config["mcpServers"]["Screen-Eyes"] = @{
+    "command" = "npx.cmd"
+    "args" = @("-y", "@modelcontextprotocol/server-puppeteer") # Replace with your preferred screen capture MCP package
+}
 
-Write-Host "--------------------------------------------------------" -ForegroundColor Cyan
-Write-Host "INSTALLATION COMPLETE!" -ForegroundColor Green
-Write-Host "Next Steps:"
-Write-Host "1. Restart Claude Desktop (fully quit from the system tray)."
-Write-Host "2. Open 'C:\Users\Dileep\LabVIEW-AI-Engine-Bridge\VI Scripting Server.lvproj' in LabVIEW 2025."
-Write-Host "3. Run 'Scripting Server\Main.vi' in LabVIEW."
-Write-Host "4. Start chatting with Claude!"
+$config | ConvertTo-Json -Depth 10 | Set-Content $ClaudeConfigPath
+Write-Host "Configured G-AI and Screen-Eyes MCP servers in Claude Desktop." -ForegroundColor Green
+
+# 4. Output Prompts/Commands for Codex and AGY
+Write-Host ""
+Write-Host "==============================================" -ForegroundColor Yellow
+Write-Host " CODEX & AGY (ANTIGRAVITY) SETUP INSTRUCTIONS" -ForegroundColor Yellow
+Write-Host "==============================================" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "To install these two MCPs in Codex, run this in Codex terminal:"
+Write-Host "  > cursor-mcp add G-AI-LabVIEW npx.cmd -y mcp-remote http://127.0.0.1:36987/mcp/server"
+Write-Host "  > cursor-mcp add Screen-Eyes npx.cmd -y @modelcontextprotocol/server-puppeteer"
+Write-Host ""
+Write-Host "To install these two MCPs in AGY (Antigravity), run this in WSL/AGY:"
+Write-Host '  > cat <<EOF > ~/.gemini/config/mcp_config.json'
+Write-Host '    {'
+Write-Host '      "mcpServers": {'
+Write-Host '        "G-AI-LabVIEW": { "command": "npx", "args": ["-y", "mcp-remote", "http://127.0.0.1:36987/mcp/server"] },'
+Write-Host '        "Screen-Eyes": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-puppeteer"] }'
+Write-Host '      }'
+Write-Host '    }'
+Write-Host '    EOF'
+Write-Host ""
+Write-Host "==============================================" -ForegroundColor Cyan
+Write-Host " VERSION REQUIREMENTS" -ForegroundColor Cyan
+Write-Host " - LabVIEW: Version 2025 or newer"
+Write-Host " - Node.js: Version 18.x or newer (for npx)"
+Write-Host " - VIPM Dependencies: 'IG HTTP Server Toolkit' & 'JKI JSONtext'"
+Write-Host "==============================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Next steps for G-AI:"
+Write-Host "1. Open LabVIEW and install the VIP package from C:\G-AI\builds\G-AI"
+Write-Host "2. Go to Tools -> G-AI to launch the server."
+Write-Host "3. Open Claude/Codex/AGY and start chatting!"
