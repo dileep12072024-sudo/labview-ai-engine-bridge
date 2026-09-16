@@ -4,37 +4,41 @@ param(
 
 Write-Host "Checking prerequisites..." -ForegroundColor Cyan
 
-# 1. Check Git
-if (-not (Get-Command "git" -ErrorAction SilentlyContinue)) {
-    Write-Host "Git is not installed. Please install Git (e.g. winget install Git.Git)." -ForegroundColor Red
-    exit 1
-}
-
-# 2. Check Node/NPM
+# 1. Check Node/NPM
 if (-not (Get-Command "npx" -ErrorAction SilentlyContinue)) {
-    Write-Host "Node.js (npx) is not installed. Please install Node.js (e.g. winget install OpenJS.NodeJS.LTS)." -ForegroundColor Red
-    exit 1
+    Write-Host "Node.js (npx) is not installed. Installing automatically via winget..." -ForegroundColor Yellow
+    winget install --id OpenJS.NodeJS.LTS -e --silent --accept-package-agreements --accept-source-agreements
+    
+    # Reload environment variables for current process
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    if (-not (Get-Command "npx" -ErrorAction SilentlyContinue)) {
+        Write-Host "Node.js installed, but you may need to close and reopen PowerShell for it to be recognized." -ForegroundColor Red
+        exit 1
+    }
 }
 
-# 3. Clone or Update Toolkit
+# 2. Download or Update Toolkit (No Git required)
 if (Test-Path $ToolkitDir) {
-    Write-Host "Updating LabVIEW-MCP-Server-Toolkit in $ToolkitDir..." -ForegroundColor Cyan
-    Push-Location $ToolkitDir
-    git pull
-    Pop-Location
+    Write-Host "LabVIEW-MCP-Server-Toolkit already exists at $ToolkitDir." -ForegroundColor Cyan
 } else {
-    Write-Host "Cloning LabVIEW-MCP-Server-Toolkit to $ToolkitDir..." -ForegroundColor Cyan
-    git clone https://github.com/JanGoebel/LabVIEW-MCP-Server-Toolkit.git $ToolkitDir
+    Write-Host "Downloading LabVIEW-MCP-Server-Toolkit to $ToolkitDir..." -ForegroundColor Cyan
+    $ZipPath = "$env:TEMP\toolkit.zip"
+    Invoke-WebRequest -Uri "https://github.com/JanGoebel/LabVIEW-MCP-Server-Toolkit/archive/refs/heads/main.zip" -OutFile $ZipPath
+    
+    Write-Host "Extracting toolkit..." -ForegroundColor Cyan
+    Expand-Archive -Path $ZipPath -DestinationPath $env:TEMP -Force
+    Move-Item -Path "$env:TEMP\LabVIEW-MCP-Server-Toolkit-main" -Destination $ToolkitDir -Force
+    Remove-Item $ZipPath -Force
 }
 
-# 4. Check for VIPM Dependencies
+# 3. Check for VIPM Dependencies
 Write-Host ""
 Write-Host "IMPORTANT: Please ensure you have the following VIPM dependencies installed in LabVIEW:" -ForegroundColor Yellow
 Write-Host " - IG HTTP Server Toolkit" -ForegroundColor Yellow
 Write-Host " - JKI JSONtext" -ForegroundColor Yellow
 Write-Host ""
 
-# 5. Configure Claude Desktop
+# 4. Configure Claude Desktop
 $ClaudeConfigDir = "$env:APPDATA\Claude"
 $ClaudeConfigPath = "$ClaudeConfigDir\claude_desktop_config.json"
 
@@ -68,6 +72,6 @@ Write-Host "--------------------------------------------------------" -Foregroun
 Write-Host "INSTALLATION COMPLETE!" -ForegroundColor Green
 Write-Host "Next Steps:"
 Write-Host "1. Restart Claude Desktop (fully quit from the system tray)."
-Write-Host "2. Open '$PSScriptRoot\VI Scripting Server.lvproj' in LabVIEW 2025 (version 25.0)."
+Write-Host "2. Open 'C:\Users\Dileep\LabVIEW-AI-Engine-Bridge\VI Scripting Server.lvproj' in LabVIEW 2025."
 Write-Host "3. Run 'Scripting Server\Main.vi' in LabVIEW."
 Write-Host "4. Start chatting with Claude!"
