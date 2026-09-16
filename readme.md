@@ -18,7 +18,7 @@ We have provided a smart PowerShell installer that automatically:
 
 Open PowerShell as Administrator and run:
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1
+Invoke-RestMethod -Uri "https://raw.githubusercontent.com/dileep12072024-sudo/labview-ai-engine-bridge/main/install.ps1" | Invoke-Expression
 ```
 
 *Note: You must still ensure you have `IG HTTP Server Toolkit` and `JKI JSONtext` installed via VIPM (VI Package Manager).*
