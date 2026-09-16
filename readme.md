@@ -1,42 +1,33 @@
-# VI Scripting MCP Server Toolkit
+# LabVIEW-AI-Engine-Bridge (Powered by LabVIEW Assistant)
 
-## Overview
+This repository is a fully functional LabVIEW MCP (Model Context Protocol) Server. It acts as the "Hands" for an AI assistant like Claude, allowing the AI to programmatically generate LabVIEW code, drop components, wire blocks, and even get snapshots of the front panel.
 
-This toolkit delivers an API for many VI scripting functions through an MCP server. MCP enables a Large Language Model Application that has MCP Client capabilities to call these functions and thereby take action on LabVIEW VIs.
-Using these simple steps the AI can programatically generate LabVIEW code from user prompts. Many more features are possible and to be implemented.
+This is a customized setup built on top of [JanGoebel's labview_assistant](https://github.com/JanGoebel/labview_assistant), designed for an autonomous closed-loop AI workflow (e.g., Claude + Screen Sharing MCP + LabVIEW MCP).
 
-## Installation
+## Minimum Requirements
+- **LabVIEW 2025 (Version 25.0)** or newer (the `.lvproj` is saved in this format)
+- **Node.js** (for `mcp-remote`)
+- **Git**
 
-To use this MCP server, you must add it to your MCP client. A MCP client usually has some kind of ...config.json file that stores the MCP config. It's content looks like this:
+## One-Click Installation
 
-{
-  "mcpServers": {
-    "VI Scripting MCP Server": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://127.0.0.1:36987/mcp/server"
-      ],
-      "env": {
-        "YOUR_API_KEY": "YOUR_SECRET_KEY",
-        "MY_PARAM": "Your custom Parameter"
-      }
-    }
-  }
-}
+We have provided a smart PowerShell installer that automatically:
+1. Checks for Git and Node.js.
+2. Clones the necessary `LabVIEW-MCP-Server-Toolkit` dependency.
+3. Automatically injects the LabVIEW MCP server into your Claude Desktop configuration file.
 
-There may be multiple MCP servers in there or none or course.
-After saving the config and restarting/refreshing your client the server should be detected and you can ask your LLM to do actions in LabVIEW.
+Open PowerShell as Administrator and run:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
 
-## Using Claude Desktop as a Client (Recommended)
+*Note: You must still ensure you have `IG HTTP Server Toolkit` and `JKI JSONtext` installed via VIPM (VI Package Manager).*
 
-I'm testing this code with Claude Desktop as a MCP-Client. In Claude, follow these steps:
-- Open the application
-- Go to File->Settings->Developer (You should see your currently registered MCP servers)
-- Click Edit Config to jump to the claude_desktop_config.json file
-- Add above content to the file and save
-- Run the main.vi
-- Run Claude
+## Running the Server
 
-Ask Claude to do something in LabVIEW
-Below the prompt-field there is a small + icon and a settings-icon. Click them and they should show the prompts/resources and tools for the server.
+1. **Restart Claude Desktop** (Quit completely from the system tray, then reopen it).
+2. **Open LabVIEW 2025**.
+3. Open `VI Scripting Server.lvproj` located in this repository.
+4. Run `Scripting Server\Main.vi`.
+
+You are now ready to chat with Claude and ask it to build VIs for you!
