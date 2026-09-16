@@ -61,7 +61,7 @@ if (-not $config.ContainsKey("mcpServers")) {
 }
 
 $config["mcpServers"]["LabVIEW-Assistant"] = @{
-    "command" = "npx"
+    "command" = "npx.cmd"
     "args" = @("mcp-remote", "http://127.0.0.1:36987/mcp/server")
 }
 
